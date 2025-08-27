@@ -49,3 +49,4 @@ grant execute on function public.insert_trade(text,bigint,text,text,numeric,time
 
 
 
+

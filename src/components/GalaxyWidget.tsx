@@ -125,3 +125,4 @@ const GalaxyWidget: React.FC<GalaxyWidgetProps> = ({ density = 0.0018, speed = 0
 };
 
 export default GalaxyWidget;
+

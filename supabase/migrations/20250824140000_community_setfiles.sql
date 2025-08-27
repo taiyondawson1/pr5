@@ -111,3 +111,4 @@ grant execute on function public.community_rate(uuid, int) to anon, authenticate
 
 
 
+

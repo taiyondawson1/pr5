@@ -69,3 +69,4 @@ left join last_trade_count c using (account_number, last_entry);
 
 
 
+

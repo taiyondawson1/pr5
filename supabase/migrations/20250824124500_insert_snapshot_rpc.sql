@@ -27,3 +27,4 @@ grant execute on function public.insert_snapshot(text,numeric,numeric,numeric,nu
 
 
 
+
