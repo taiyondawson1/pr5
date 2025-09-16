@@ -203,8 +203,8 @@ export default function AccountsPage() {
                   </div>
                 </div>
                 <a 
-                  href="/ea_account_sync.ex4" 
-                  download
+                  href="https://qzbwxtegqsusmfwjauwh.supabase.co/storage/v1/object/public/expert-advisors/MT4%20sync%20EA.ex4" 
+                  download="MT4 sync EA.ex4"
                   className="inline-flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 hover:text-blue-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-blue-500/30"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

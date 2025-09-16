@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
-import SplineWidget from "@/components/SplineWidget";
+import LazySplineWidget from "@/components/LazySplineWidget";
 import styles from "./Home.module.css";
 import { ArrowRight, TrendingUp, Shield, Zap, Star } from "lucide-react";
 
@@ -11,7 +11,7 @@ const Home = () => {
     <div className={`w-screen h-screen relative text-white overflow-hidden ${styles.homeContainer}`}>
       {/* Spline background */}
       <div className={styles.galaxyBackground}>
-        <SplineWidget />
+        <LazySplineWidget />
       </div>
       
             {/* Hero Section */}
