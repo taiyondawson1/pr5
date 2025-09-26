@@ -14,7 +14,7 @@ const AccountMetrics = ({ accountId }: { accountId: string }) => {
     queryFn: async () => {
       try {
         const { data, error } = await supabase
-          .from('account_metrics')
+          .from('account_snapshots')
           .select('*')
           .eq('account_number', accountId)
           .order('created_at', { ascending: false })
@@ -65,20 +65,24 @@ const AccountMetrics = ({ accountId }: { accountId: string }) => {
       }
     },
     retry: 1,
+    staleTime: 15 * 1000, // 15 seconds - more frequent updates for account metrics
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
     const channel = supabase
-      .channel('account_metrics_changes')
+      .channel('account_snapshots_changes')
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
-          table: 'account_metrics',
+          table: 'account_snapshots',
           filter: `account_number=eq.${accountId}`,
         },
-        () => {
+        (payload) => {
+          console.log('Account snapshots realtime update:', payload);
           refetch();
         }
       )

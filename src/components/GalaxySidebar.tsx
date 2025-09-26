@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, LayoutDashboard, BarChart, Bot, FileText, BookOpen, Key, LogOut } from "lucide-react";
+import { Home, LayoutDashboard, BarChart, Bot, FileText, BookOpen, Key, LogOut, MessageCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,6 +12,7 @@ const links = [
   { to: "/setfiles", label: "Setfiles", icon: FileText },
   { to: "/community-setfiles", label: "Community Setfiles", icon: FileText },
   { to: "/courses", label: "Courses", icon: BookOpen },
+  { to: "/discord", label: "Private Group", icon: MessageCircle },
   { to: "/license-key", label: "License Key", icon: Key },
 ];
 
@@ -36,7 +37,7 @@ export default function GalaxySidebar() {
   };
 
   return (
-    <aside className="hidden lg:flex w-[120px] shrink-0 flex-col border-r border-border/50 bg-[hsl(var(--background))]/80 backdrop-blur-md h-screen fixed top-0 left-0 z-50">
+    <aside className="hidden md:flex w-[80px] xl:w-[120px] shrink-0 flex-col border-r border-border/50 bg-[hsl(var(--background))]/80 backdrop-blur-md h-screen fixed top-0 left-0 z-50">
       <div className="h-16 flex items-center justify-center px-2">
         <div className="flex flex-col items-center gap-1">
           <img src="/platinumai-logo.svg" alt="PlatinumAi" className="h-8 w-8 object-contain" />

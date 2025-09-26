@@ -19,11 +19,22 @@ import Register from "@/pages/Register";
 import Home from "@/pages/Home";
 import LicenseKey from "@/pages/LicenseKey";
 import EnrollmentFixer from "@/pages/EnrollmentFixer";
+import DiscordPage from "@/pages/Discord";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30 * 1000, // 30 seconds - data is fresh for 30 seconds
+      cacheTime: 5 * 60 * 1000, // 5 minutes - cache for 5 minutes
+      refetchOnWindowFocus: true, // Refetch when window regains focus
+      refetchOnMount: true, // Always refetch on component mount
+      refetchInterval: 60 * 1000, // Refetch every 60 seconds
+    },
+  },
+});
 
 function PrivateRoute({
   children
@@ -40,6 +51,14 @@ function PrivateRoute({
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // For development, skip Supabase auth check temporarily
+        if (import.meta.env.DEV) {
+          console.log("Development mode - skipping auth check");
+          setIsAuthenticated(true);
+          setIsLoading(false);
+          return;
+        }
+        
         const {
           data: {
             session
@@ -71,11 +90,8 @@ function PrivateRoute({
       }
     };
     checkAuth();
-    const {
-      data: {
-        subscription
-      }
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    // Skip auth state change listener in development mode
+    const subscription = import.meta.env.DEV ? null : supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed - Event:", event, "Session:", session);
       if (event === 'SIGNED_IN' && session) {
         setIsAuthenticated(true);
@@ -97,7 +113,9 @@ function PrivateRoute({
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
-      subscription.unsubscribe();
+      if (subscription) {
+        subscription.unsubscribe();
+      }
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [navigate, location]);
@@ -157,6 +175,10 @@ function MainContent() {
             <Route
               path="/community-setfiles"
               element={<PrivateRoute><GalaxyShell><CommunitySetfiles /></GalaxyShell></PrivateRoute>}
+            />
+            <Route
+              path="/discord"
+              element={<PrivateRoute><GalaxyShell><DiscordPage /></GalaxyShell></PrivateRoute>}
             />
             <Route
               path="/connect-myfxbook"

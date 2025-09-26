@@ -135,9 +135,27 @@
       backdrop-filter: blur(10px);
     }
   }
+
+  /* Laptop responsive adjustments - key fix for laptop users */
+  @media (min-width: 1024px) and (max-width: 1600px) {
+    /* Reduce content width for laptops */
+    .dashboard-container {
+      max-width: 95vw;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    .glass-card {
+      backdrop-filter: blur(20px);
+    }
+    
+    .glass-elevated {
+      backdrop-filter: blur(25px);
+    }
+  }
   
-  @media (min-width: 1024px) {
-    /* Desktop enhancements */
+  @media (min-width: 1600px) {
+    /* Desktop enhancements for large screens */
     .glass-card {
       backdrop-filter: blur(25px);
     }
@@ -316,8 +334,32 @@ img, video, iframe {
   }
 }
 
-/* Center content on larger screens */
-@media (min-width: 1400px) {
+  /* Mobile safe area support */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Mobile navigation spacing */
+  @media (max-width: 768px) {
+    .mobile-content {
+      padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+    }
+  }
+
+  /* Prevent horizontal scrolling on mobile */
+  @media (max-width: 768px) {
+    body {
+      overflow-x: hidden;
+    }
+    
+    .dashboard-grid {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+  }
+
+  /* Center content on larger screens */
+  @media (min-width: 1400px) {
   .container {
     margin-left: auto;
     margin-right: auto;

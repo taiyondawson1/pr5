@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check Database Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 8px; background: #2a2a2a; }
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+        .info { color: #74c0fc; }
+        .warning { color: #ffd43b; }
+        pre { background: #1a1a1a; padding: 15px; overflow-x: auto; border-radius: 4px; border: 1px solid #333; }
+        input, button { padding: 8px 12px; margin: 5px; border-radius: 4px; border: 1px solid #555; }
+        input { background: #333; color: white; }
+        button { background: #0066cc; color: white; cursor: pointer; }
+        button:hover { background: #0052a3; }
+        .status { padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .status.loading { background: #1a1a1a; border: 1px solid #555; }
+        .status.success { background: #1a3a1a; border: 1px solid #51cf66; }
+        .status.error { background: #3a1a1a; border: 1px solid #ff6b6b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Database Data Checker</h1>
+        
+        <div class="section">
+            <h2>Step 1: Enter Your MT4 Account Number</h2>
+            <p>In MT4, go to <strong>Help → About</strong> to find your account number:</p>
+            <input type="text" id="accountNumber" placeholder="Enter your MT4 account number" style="width: 250px;">
+            <button onclick="checkDatabase()">Check Database</button>
+        </div>
+
+        <div class="section">
+            <h2>Step 2: Database Results</h2>
+            <div id="results"></div>
+        </div>
+
+        <div class="section">
+            <h2>Step 3: What This Means</h2>
+            <div id="explanation"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://qzbwxtegqsusmfwjauwh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6Ynd4dGVncXN1c21md2phdXdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc2NTgwMzMsImV4cCI6MjA1MzIzNDAzM30.N3vIgRtWmaEVkaNEWDo_ywfzOu-gSupjCQywKQA8kz8';
+
+        async function checkDatabase() {
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const resultsDiv = document.getElementById('results');
+            const explanationDiv = document.getElementById('explanation');
+            
+            if (!accountNumber) {
+                resultsDiv.innerHTML = '<div class="status error">❌ Please enter your account number first.</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div class="status loading">🔄 Checking database for account ' + accountNumber + '...</div>';
+            explanationDiv.innerHTML = '';
+
+            try {
+                // Check account_snapshots table (where EA sends data)
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/account_snapshots?account_number=eq.${accountNumber}&order=created_at.desc&limit=10`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="status error">
+                            ❌ <strong>NO DATA FOUND</strong><br>
+                            No data found for account ${accountNumber}
+                        </div>
+                    `;
+                    
+                    explanationDiv.innerHTML = `
+                        <div class="status error">
+                            <h3>🚨 Database is NOT receiving data from your account</h3>
+                            <p><strong>Possible causes:</strong></p>
+                            <ul>
+                                <li>MT4 EA is not running or not connected</li>
+                                <li>Account number mismatch between MT4 and database</li>
+                                <li>EA is not sending data to database</li>
+                                <li>Network connectivity issues</li>
+                            </ul>
+                            <p><strong>Next steps:</strong></p>
+                            <ol>
+                                <li>Check MT4 Experts tab - EA should show 😊</li>
+                                <li>Verify AutoTrading is enabled in MT4</li>
+                                <li>Check MT4 Journal for error messages</li>
+                                <li>Wait 1-2 minutes for sync (EA syncs every 60 seconds)</li>
+                            </ol>
+                        </div>
+                    `;
+                } else {
+                    const latest = data[0];
+                    const dataCount = data.length;
+                    const latestTime = new Date(latest.created_at).toLocaleString();
+                    
+                    resultsDiv.innerHTML = `
+                        <div class="status success">
+                            ✅ <strong>DATA FOUND!</strong><br>
+                            Found ${dataCount} records for account ${accountNumber}<br>
+                            Latest update: ${latestTime}
+                        </div>
+                        <h3>Latest Data:</h3>
+                        <pre>${JSON.stringify(latest, null, 2)}</pre>
+                        <h3>Recent Data History:</h3>
+                        <pre>${JSON.stringify(data.slice(0, 3), null, 2)}</pre>
+                    `;
+                    
+                    explanationDiv.innerHTML = `
+                        <div class="status success">
+                            <h3>✅ Database IS receiving data from your account!</h3>
+                            <p><strong>This means:</strong></p>
+                            <ul>
+                                <li>Your MT4 EA is working correctly</li>
+                                <li>Data is being sent to the database successfully</li>
+                                <li>The connection between MT4 and database is working</li>
+                            </ul>
+                            <p><strong>If you still don't see data in your web app:</strong></p>
+                            <ul>
+                                <li>The web app might be looking in the wrong table</li>
+                                <li>There might be a display issue in the frontend</li>
+                                <li>Try refreshing your web app dashboard</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ <strong>ERROR CHECKING DATABASE</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+                
+                explanationDiv.innerHTML = `
+                    <div class="status error">
+                        <h3>🚨 Database connection error</h3>
+                        <p>This could be a network issue or database permission problem.</p>
+                        <p>Try again in a few moments.</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -1,5 +1,6 @@
 import React from "react";
 import GalaxySidebar from "@/components/GalaxySidebar";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { Link } from "react-router-dom";
 
 interface GalaxyShellProps {
@@ -24,10 +25,13 @@ export default function GalaxyShell({ children }: GalaxyShellProps) {
       {/* Top nav removed as requested */}
       <div className="flex relative z-10">
         <GalaxySidebar />
-        <main className="flex-1 min-w-0 relative lg:ml-[120px]">
+        <main className="flex-1 min-w-0 relative md:ml-[80px] xl:ml-[120px] pb-16 md:pb-0">
           {children}
         </main>
       </div>
+      
+      {/* Mobile bottom navigation */}
+      <MobileBottomNav />
     </div>
   );
 }

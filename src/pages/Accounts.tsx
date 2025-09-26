@@ -259,6 +259,48 @@ export default function AccountsPage() {
                 </p>
               </div>
             </div>
+
+            {/* Web Request Configuration */}
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10 mt-4">
+              <h3 className="font-semibold text-white mb-3">Web Request Configuration</h3>
+              <p className="text-sm text-white/80 mb-3">
+                To enable the EA to send data to PlatinumAi, you need to add our server URL to MetaTrader's web request settings.
+              </p>
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-3">
+                <p className="text-sm text-blue-300 font-mono break-all">
+                  <strong>Server URL:</strong><br />
+                  https://qzbwxtegqsusmfwjauwh.supabase.co/
+                </p>
+              </div>
+              <ol className="text-sm text-white/80 space-y-2">
+                <li className="flex gap-2">
+                  <span className="text-purple-400 font-bold">1.</span>
+                  <span>In MetaTrader 4, go to <strong>Tools → Options</strong></span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-purple-400 font-bold">2.</span>
+                  <span>Click on the <strong>Expert Advisors</strong> tab</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-purple-400 font-bold">3.</span>
+                  <span>Check <strong>"Allow WebRequest for listed URL"</strong></span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-purple-400 font-bold">4.</span>
+                  <span>Click <strong>"Add"</strong> and paste the URL above</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-purple-400 font-bold">5.</span>
+                  <span>Click <strong>"OK"</strong> to save the settings</span>
+                </li>
+              </ol>
+              
+              <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                <p className="text-xs text-red-300">
+                  <strong>Security Note:</strong> Only add trusted URLs to the web request list. This URL is secure and necessary for data synchronization.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 

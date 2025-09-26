@@ -495,7 +495,7 @@ const LicenseKey = () => {
                   placeholder="Enter MT4 account number"
                   value={newAccount}
                   onChange={(e) => setNewAccount(e.target.value)}
-                  className="flex-1 bg-darkGrey/50 border-silver/20"
+                  className="flex-1 bg-white/90 border-gray-300 text-gray-900 placeholder:text-gray-500"
                   disabled={!canAddAccounts || accountsLocked || accountNumbers.length >= maxAccounts}
                 />
                 <Button 

@@ -113,6 +113,7 @@ const Dashboard = () => {
   const [glowOpacity, setGlowOpacity] = useState(1);
   const [glowColor, setGlowColor] = useState<'red' | 'green'>('red');
 
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -283,10 +284,28 @@ const Dashboard = () => {
         const balanceNow = latestSnap ? Number(latestSnap.balance) || 0 : 0;
         const floatingNow = latestSnap ? Number(latestSnap.floating) || 0 : 0;
         const prevEq = prevSnap ? Number(prevSnap.equity) || equityNow : equityNow;
-        // Prefer last day's percentage from daily view; fallback to last-two-snapshots diff
-        const recentResultPct = (daily && (daily as any[]).length > 0)
-          ? (Number((daily as any[])[0].result_pct) || 0)
-          : (prevEq > 0 ? ((equityNow - prevEq) / prevEq) * 100 : 0);
+        // Calculate percentage based on current balance for more accurate representation
+        let recentResultPct = 0;
+        if (daily && (daily as any[]).length > 0) {
+          const dailyData = (daily as any[])[0];
+          const resultUsd = Number(dailyData.result_usd) || 0;
+          
+          // Use current balance as denominator for percentage calculation
+          // This gives a more accurate percentage relative to current account size
+          recentResultPct = balanceNow > 0 ? (resultUsd / balanceNow) * 100 : 0;
+          
+          // Debug logging for percentage calculation
+          console.log('Daily percentage calculation:', {
+            result_usd: resultUsd,
+            balance_now: balanceNow,
+            calculated_pct: recentResultPct,
+            db_result_pct: dailyData.result_pct,
+            start_equity: dailyData.start_equity || 'not available'
+          });
+        } else {
+          // Fallback to snapshot-based calculation
+          recentResultPct = prevEq > 0 ? ((equityNow - prevEq) / prevEq) * 100 : 0;
+        }
 
         // Max drawdown over snapshots
         let peak = snaps.length > 0 ? snaps[0].equity : equityNow;
@@ -322,9 +341,10 @@ const Dashboard = () => {
       .channel('account_metrics_chart')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'account_metrics', filter: `account_number=eq.${accountId}` },
-        () => {
-          // Re-load on new snapshots
+        { event: '*', schema: 'public', table: 'account_metrics', filter: `account_number=eq.${accountId}` },
+        (payload) => {
+          console.log('Account metrics updated:', payload);
+          // Re-load on any changes to account metrics
           load();
         }
       )
@@ -393,7 +413,7 @@ const Dashboard = () => {
   }, [accountStatus]);
 
   return (
-    <main className="flex-1 relative">
+    <main className="flex-1 relative dashboard-container mobile-content">
       {/* Purple background overlay removed - now handled by GalaxyShell */}
       
       {(accountStatus.isNegative || accountStatus.isPositive) && (
@@ -417,16 +437,25 @@ const Dashboard = () => {
         }}
       >
 
+        {/* Header */}
+        <div className="flex justify-between items-center px-2 sm:px-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">
+            Trading Dashboard
+            {accountId && (
+              <span className="text-lg text-gray-400 ml-2">#{accountId}</span>
+            )}
+          </h1>
+        </div>
         
         {/* Top stats row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 px-2 sm:px-0">
           <StatCard title="Result (prev period)" value={`${kpis ? (kpis.recentResultPct >= 0 ? '+' : '') + kpis.recentResultPct.toFixed(2) + '%' : '—'}`} subAsBadge icon={<TrendingUp className="h-5 w-5 text-galaxy-blue-400" />} />
           <StatCard title="Max drawdown" value={`${kpis ? '-' + kpis.maxDrawdownPct.toFixed(2) + '%' : '—'}`} subAsBadge icon={<TrendingDown className="h-5 w-5 text-rose-400" />} />
           <StatCard title="Float" value={kpis ? `$${Math.round(kpis.floating).toLocaleString()}` : '—'} icon={<Droplets className="h-5 w-5 text-cyan-300" />} />
         </div>
 
         {/* Chart + side table */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 px-2 sm:px-0">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -480,14 +509,18 @@ const Dashboard = () => {
                 const dateStr = new Date(row.day).toLocaleDateString(undefined, { day: '2-digit', month: 'short' });
                 const pos = row.result_usd >= 0;
                 const resClass = pos ? 'text-emerald-500' : 'text-red-500';
-                const pctClass = row.result_pct >= 0 ? 'text-emerald-500' : 'text-red-500';
+                
+                // Calculate percentage based on current balance for more accurate representation
+                const calculatedPct = kpis && kpis.balance > 0 ? (row.result_usd / kpis.balance) * 100 : 0;
+                const pctClass = calculatedPct >= 0 ? 'text-emerald-500' : 'text-red-500';
                 const ddClass = 'text-white';
+                
                 return (
                   <div key={idx} className={`grid grid-cols-4 text-sm ${idx > 0 ? 'border-t border-border/50' : ''}`}>
                     <div className="px-2 sm:px-4 py-2 text-white">{dateStr}</div>
                     <div className={`px-2 sm:px-4 py-2 ${ddClass}`}>{`${row.drawdown_pct.toFixed(2)}%`}</div>
                     <div className={`px-2 sm:px-4 py-2 font-medium ${resClass}`}>{`${pos ? '+' : ''}$${row.result_usd.toFixed(2)}`}</div>
-                    <div className={`px-2 sm:px-4 py-2 font-medium ${pctClass}`}>{`${row.result_pct >= 0 ? '+' : ''}${row.result_pct.toFixed(2)}%`}</div>
+                    <div className={`px-2 sm:px-4 py-2 font-medium ${pctClass}`}>{`${calculatedPct >= 0 ? '+' : ''}${calculatedPct.toFixed(2)}%`}</div>
                   </div>
                 );
               })}
@@ -497,7 +530,7 @@ const Dashboard = () => {
         </div>
 
         {/* Summary cards rows */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 px-2 sm:px-0">
           <StatCard
             title="Total result"
             value={(
@@ -518,14 +551,14 @@ const Dashboard = () => {
             icon={<TrendingDown className="h-5 w-5 text-rose-400" />}
           />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 px-2 sm:px-0">
           <StatCard title="Balance" value={kpis ? `$${Math.round(kpis.balance).toLocaleString()}` : '—'} icon={<Droplets className="h-5 w-5 text-cyan-300" />} />
           <StatCard title="Equity" value={kpis ? `$${Math.round(kpis.equity).toLocaleString()}` : '—'} icon={<Droplets className="h-5 w-5 text-cyan-300" />} />
           <StatCard title="Total withdrawals" value="$0" icon={<Droplets className="h-5 w-5 text-cyan-300" />} />
         </div>
 
         {/* Additional KPIs row (bottom) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 px-2 sm:px-0">
           <StatCard title="Average win" value={kpis?.averageWin !== undefined ? `$${Math.round(kpis.averageWin).toLocaleString()}` : '—'} icon={<TrendingUp className="h-5 w-5 text-galaxy-blue-400" />} />
           <StatCard title="Average loss" value={kpis?.averageLoss !== undefined ? `-$${Math.round(kpis.averageLoss).toLocaleString()}` : '—'} icon={<TrendingDown className="h-5 w-5 text-rose-400" />} />
           <StatCard title="Win rate" value={<span className="text-emerald-400">{kpis?.winRate !== undefined ? `${kpis.winRate.toFixed(2)}%` : '—'}</span>} icon={<TrendingUp className="h-5 w-5 text-emerald-400" />} />
