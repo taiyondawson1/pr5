@@ -92,6 +92,9 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const accountId = params.get("accountId") || undefined;
+  
+  // Debug logging
+  console.log("Dashboard component loaded", { accountId, location: location.pathname });
   const [equitySnapshots, setEquitySnapshots] = useState<{ ts: number; equity: number }[]>([]);
   const [dailyRows, setDailyRows] = useState<Array<{ day: string; drawdown_pct: number; result_usd: number; result_pct: number }>>([]);
   const [kpis, setKpis] = useState<{

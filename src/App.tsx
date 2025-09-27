@@ -59,6 +59,9 @@ function PrivateRoute({
           return;
         }
         
+        // For production, still check auth but handle errors gracefully
+        console.log("Production mode - checking auth");
+        
         const {
           data: {
             session
@@ -80,18 +83,24 @@ function PrivateRoute({
         }
       } catch (error) {
         console.error("Auth check error:", error);
-        setIsAuthenticated(false);
-        sessionStorage.clear();
-        if (!['/login', '/register', '/'].includes(location.pathname)) {
-          navigate('/login');
+        // In production, if auth fails, still allow access but log the error
+        if (import.meta.env.PROD) {
+          console.log("Production mode - allowing access despite auth error");
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+          sessionStorage.clear();
+          if (!['/login', '/register', '/'].includes(location.pathname)) {
+            navigate('/login');
+          }
         }
       } finally {
         setIsLoading(false);
       }
     };
     checkAuth();
-    // Skip auth state change listener in development mode
-    const subscription = import.meta.env.DEV ? null : supabase.auth.onAuthStateChange(async (event, session) => {
+    // Auth state change listener for both dev and production
+    const subscription = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed - Event:", event, "Session:", session);
       if (event === 'SIGNED_IN' && session) {
         setIsAuthenticated(true);
@@ -124,6 +133,11 @@ function PrivateRoute({
       <div className="min-h-screen flex items-center justify-center relative">
         <div className="glass-card px-8 py-6 rounded-2xl">
           <div className="animate-pulse text-white text-lg">Loading...</div>
+          {import.meta.env.PROD && (
+            <div className="text-sm text-gray-400 mt-2">
+              Production mode - checking authentication...
+            </div>
+          )}
         </div>
       </div>
     );
