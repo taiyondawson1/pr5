@@ -362,7 +362,10 @@ const Dashboard = () => {
         }
       )
       .subscribe();
-    return () => { supabase.removeChannel(channel); supabase.removeChannel(tradesChannel); };
+    return () => { 
+      if (channel) supabase.removeChannel(channel); 
+      if (tradesChannel) supabase.removeChannel(tradesChannel); 
+    };
   }, [accountId]);
 
   useEffect(() => {

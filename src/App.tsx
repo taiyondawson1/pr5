@@ -122,7 +122,7 @@ function PrivateRoute({
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
-      if (subscription) {
+      if (subscription && typeof subscription.unsubscribe === 'function') {
         subscription.unsubscribe();
       }
       document.removeEventListener('visibilitychange', handleVisibilityChange);
