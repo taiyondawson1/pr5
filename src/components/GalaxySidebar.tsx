@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, LayoutDashboard, BarChart, Bot, FileText, BookOpen, Key, LogOut, MessageCircle } from "lucide-react";
+import { Home, LayoutDashboard, BarChart, Bot, FileText, BookOpen, Key, LogOut, MessageCircle, Filter } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
@@ -8,6 +8,7 @@ const links = [
   { to: "/", label: "Home", icon: Home },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/expert-advisors", label: "Expert Advisors", icon: Bot },
+  { to: "/icefx-news-filter", label: "News Filter", icon: Filter },
   { to: "/accounts", label: "Accounts", icon: BarChart },
   { to: "/setfiles", label: "Setfiles", icon: FileText },
   { to: "/community-setfiles", label: "Community Setfiles", icon: FileText },
@@ -29,7 +30,7 @@ export default function GalaxySidebar() {
 
   const getTextStyle = (label: string) => {
     // Allow wrapping for longer labels
-    if (label === "Expert Advisors" || label === "Community Setfiles") {
+    if (label === "Expert Advisors" || label === "Community Setfiles" || label === "News Filter") {
       return "leading-tight w-full text-center whitespace-normal break-words";
     }
     // Keep single line for shorter labels

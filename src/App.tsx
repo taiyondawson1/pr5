@@ -20,6 +20,7 @@ import Home from "@/pages/Home";
 import LicenseKey from "@/pages/LicenseKey";
 import EnrollmentFixer from "@/pages/EnrollmentFixer";
 import DiscordPage from "@/pages/Discord";
+import IceFXNewsFilterPage from "@/pages/IceFXNewsFilter";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
@@ -205,6 +206,10 @@ function MainContent() {
             <Route
               path="/fix-enrollment"
               element={<PrivateRoute><GalaxyShell><EnrollmentFixer /></GalaxyShell></PrivateRoute>}
+            />
+            <Route
+              path="/icefx-news-filter"
+              element={<PrivateRoute><GalaxyShell><IceFXNewsFilterPage /></GalaxyShell></PrivateRoute>}
             />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
