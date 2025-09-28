@@ -10,9 +10,9 @@ const IceFXNewsFilterContent = () => {
   const files = [
     {
       name: "IceFX.NewsInfo.ex4",
-      description: "Main Expert Advisor file for MT4",
+      description: "News filter indicator for MT4",
       downloadUrl: "https://qzbwxtegqsusmfwjauwh.supabase.co/storage/v1/object/public/expert-advisors/IceFX.NewsInfo.ex4",
-      type: "Expert Advisor"
+      type: "Indicator"
     },
     {
       name: "IceFX.NewsInfo.dll",
@@ -65,8 +65,8 @@ const IceFXNewsFilterContent = () => {
     },
     {
       step: 2,
-      title: "Install Expert Advisor",
-      description: "Copy IceFX.NewsInfo.ex4 to your MT4 MQL4/Experts folder",
+      title: "Install Indicator",
+      description: "Copy IceFX.NewsInfo.ex4 to your MT4 MQL4/Indicators folder",
       icon: FileText
     },
     {
