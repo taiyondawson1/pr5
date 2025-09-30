@@ -77,8 +77,8 @@ const IceFXNewsFilterContent = () => {
     },
     {
       step: 4,
-      title: "Load Settings",
-      description: "Import the .set file into your PlatinumAi Infinity EA",
+      title: "Attach Indicator & Load Setfile",
+      description: "Drag IceFX.NewsInfo from the Navigator onto the SAME chart running PlatinumAi Infinity, then click 'Load' inside the IceFX indicator inputs and select the NEWS FILTER SETFILE FOR INFINITY.set",
       icon: CheckCircle
     }
   ];
@@ -279,8 +279,8 @@ const IceFXNewsFilterContent = () => {
                 border: '1px solid rgba(255, 255, 255, 0.05)'
               }}
             >
-              <h4 className="text-white font-medium mb-2">1. Load the Settings File</h4>
-              <p>In your PlatinumAi Infinity EA settings, click "Load" and select the "NEWS FILTER SETFILE FOR INFINITY.set" file.</p>
+              <h4 className="text-white font-medium mb-2">1. Attach IceFX To The Chart</h4>
+              <p>Open the same chart where PlatinumAi Infinity is running. From the Navigator → Indicators, drag <span className="font-semibold">IceFX.NewsInfo</span> onto this chart.</p>
             </div>
             
             <div className="p-4 rounded-lg"
@@ -289,8 +289,8 @@ const IceFXNewsFilterContent = () => {
                 border: '1px solid rgba(255, 255, 255, 0.05)'
               }}
             >
-              <h4 className="text-white font-medium mb-2">2. Enable News Filter</h4>
-              <p>Make sure the "Use News Filter" option is enabled in your EA settings. This will automatically pause trading during high-impact news events.</p>
+              <h4 className="text-white font-medium mb-2">2. Load The News Filter Setfile</h4>
+              <p>In the IceFX indicator inputs dialog, click <span className="font-semibold">Load</span> and choose <span className="font-semibold">NEWS FILTER SETFILE FOR INFINITY.set</span>. Click OK to apply.</p>
             </div>
             
             <div className="p-4 rounded-lg"
@@ -299,8 +299,8 @@ const IceFXNewsFilterContent = () => {
                 border: '1px solid rgba(255, 255, 255, 0.05)'
               }}
             >
-              <h4 className="text-white font-medium mb-2">3. Configure News Settings</h4>
-              <p>Adjust the news filter parameters according to your risk tolerance. The default settings are optimized for most trading conditions.</p>
+              <h4 className="text-white font-medium mb-2">3. Confirm It Syncs With Infinity</h4>
+              <p>Ensure both PlatinumAi Infinity and IceFX are on the same chart. The indicator will handle pausing around high‑impact events using the loaded settings.</p>
             </div>
             
             <div className="p-4 rounded-lg"
